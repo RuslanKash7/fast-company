@@ -31,7 +31,7 @@ const Users = () => {
   // const renderTable = () => {if (users.length === 0) {
   //   <div/>
   // } else {
-    
+
   // }
 
   return (
@@ -44,41 +44,44 @@ const Users = () => {
         )} тусанет с тобой`}</h1>
       )}
       {/*можно переписать через функцию, ну уж ладно */}
-      <table className="table">
-          <thead>
-            <tr>
-              <th>Имя</th>
-              <th>Качества</th>
-              <th>Профессия</th>
-              <th>Встретился, раз</th>
-              <th>Оценка</th>
-              <th></th>
+      
+      {users.length > 0 ? (
+        <table className="table">
+        <thead>
+          <tr>
+            <th>Имя</th>
+            <th>Качества</th>
+            <th>Профессия</th>
+            <th>Встретился, раз</th>
+            <th>Оценка</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {users.map((user) => (
+            <tr key="user._id">
+              <td>{user.name}</td>
+              <td>{user._id}</td>
+              <td>{user.profession.name}</td>
+              <td>{user.completedMeetings}</td>
+              <td>{`${user.rate}/5`}</td>
+              <td>
+                <button
+                  className="btn btn-danger"
+                  onClick={() => handleDelete(user)}
+                >
+                  delete
+                </button>
+              </td>
             </tr>
-          </thead>
-          <tbody>
-            {users.map((user) => (
-              <tr key="user._id">
-                <td>{user.name}</td>
-                <td>{user._id}</td>
-                <td>{user.profession.name}</td>
-                <td>{user.completedMeetings}</td>
-                <td>{`${user.rate}/5`}</td>
-                <td>
-                  <button
-                    className="btn btn-danger"
-                    onClick={() => handleDelete(user)}
-                  >
-                    delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+          ))}
+        </tbody>
+      </table>
+      ) : (
+        <div/>
+      )}
 
-        
-  
-       
+      
     </>
   );
 };
