@@ -11,11 +11,6 @@ function App() {
   };
 
   const handleToggleBookMark = (id) => {
-    // console.log('handleToggleBookMark', id)
-    // const q = users.map ((el) => {
-    //   if (el._id)
-    // })
-    // console.log()
     const doToggle = users.map((el) => {
       if (el._id === id) {
         el.bookmark = !el.bookmark;
