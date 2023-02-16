@@ -1,51 +1,35 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import PropTypes from "prop-types";
 import { useHistory } from "react-router-dom";
 import api from "../api";
-// import QualitiesList from "./qualitiesList";
+import QualitiesList from "./qualitiesList";
 
-const UserPage = (id) => {
+const UserPage = ({ id }) => {
   const history = useHistory();
   const handleReturn = () => {
     history.replace("/users");
   };
 
-  const myId = id.id;
+  const [userPage, setUserPage] = useState(null);
 
-  const [userPageName, setUserPageName] = useState();
-  useState(() => {
-    api.users.getById(myId).then((data) => setUserPageName(data.name));
-  });
+  useEffect(() => {
+    api.users.getById(id).then((data) => setUserPage(data));
+  }, []);
 
-  const [userPageCompletedMeetings, setUserPageCompletedMeetings] = useState();
-  useState(() => {
-    api.users
-      .getById(myId)
-      .then((data) => setUserPageCompletedMeetings(data.completedMeetings));
-  });
+  if (userPage) {
+    console.log(userPage);
+    console.log(userPage.name);
+    console.log(userPage.profession.name);
+  }
 
-  const [userPageRate, setUserPageRate] = useState();
-  useState(() => {
-    api.users.getById(myId).then((data) => setUserPageRate(data.rate));
-  });
-
-  const [userPageQualities, setUserPageQualities] = useState();
-  useState(() => {
-    api.users
-      .getById(myId)
-      .then((data) => setUserPageQualities(data.qualities));
-  });
-
-  // .map((el) => { return el.name; }) с этим качества бывает выводит...
-
-  console.log({ userPageQualities });
-
-  if (userPageName) {
+  if (userPage) {
     return (
       <>
-        <h1>{userPageName}</h1>
-        {/* <QualitiesList qualities={ userPageQualities } /> */}
-        <h6>{`completedMeetings: ${userPageCompletedMeetings}`}</h6>
-        <h3>{`Rate: ${userPageRate}`}</h3>
+        <h1>{userPage.name}</h1>
+        <h3>{`Профессия: ${userPage.profession.name}`}</h3>
+        <QualitiesList qualities={userPage.qualities} />
+        <h6>{`completedMeetings: ${userPage.completedMeetings}`}</h6>
+        <h3>{`Rate: ${userPage.rate}`}</h3>
         <button
           onClick={() => {
             handleReturn();
@@ -57,6 +41,10 @@ const UserPage = (id) => {
     );
   }
   return <h2>LOADING...</h2>;
+};
+
+UserPage.propTypes = {
+  id: PropTypes.string.isRequired
 };
 
 export default UserPage;
