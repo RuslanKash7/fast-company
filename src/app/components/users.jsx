@@ -7,6 +7,7 @@ import GroupList from "./groupList";
 import SearchStatus from "./searchStatus";
 import UsersTable from "./usersTable";
 import _ from "lodash";
+import SearchField from "./searchField";
 
 const Users = () => {
   const pageSize = 8;
@@ -15,6 +16,7 @@ const Users = () => {
   const [selectedProf, setSelectedProf] = useState();
   const [sortBy, setSortBy] = useState({ iter: "name", order: "asc" });
   const [users, setUsers] = useState();
+  const [searchName, setSearchName] = useState(""); // нужен для поиска, из searchField
 
   useEffect(() => {
     api.users.fetchAll().then((data) => setUsers(data));
@@ -44,6 +46,7 @@ const Users = () => {
 
   const handleProfessionSelect = (item) => {
     setSelectedProf(item);
+    setSearchName(""); // добавил обнуление
   };
 
   const handlePageChange = (pageIndex) => {
@@ -56,12 +59,30 @@ const Users = () => {
 
   const clearFilter = () => {
     setSelectedProf();
+    setSearchName(""); // добавил обнуление
   };
 
+  const handleOnSearch = (e) => {
+    setSelectedProf(); // добавил обнуление
+    setSearchName(e.target.value);
+  }; // нужен для выполнеия поиска
+
   if (users) {
-    const filteredUsers = selectedProf
-      ? users.filter((user) => JSON.stringify(user.profession) === JSON.stringify(selectedProf))
+    const searchedUsers = users.filter((user) => {
+      return user.name.toLowerCase().includes(searchName.toLowerCase());
+    });
+    console.log(searchedUsers);
+
+    const filteredUsers1 = selectedProf
+      ? users.filter(
+        (user) =>
+          JSON.stringify(user.profession) === JSON.stringify(selectedProf)
+      )
       : users;
+
+    const filteredUsers = searchName
+      ? searchedUsers
+      : filteredUsers1;
 
     const count = filteredUsers.length;
 
@@ -85,6 +106,7 @@ const Users = () => {
         )}
         <div className="d-flex flex-column">
           <SearchStatus length={count} />
+          <SearchField searchName={searchName} onSearch={handleOnSearch} />
           {count > 0 && (
             <UsersTable
               users={userCrop}
