@@ -17,12 +17,6 @@ const UserPage = ({ id }) => {
   }, []);
 
   if (userPage) {
-    console.log(userPage);
-    console.log(userPage.name);
-    console.log(userPage.profession.name);
-  }
-
-  if (userPage) {
     return (
       <>
         <h1>{userPage.name}</h1>
