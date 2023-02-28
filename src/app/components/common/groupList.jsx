@@ -11,7 +11,7 @@ const GroupList = ({
   if (!Array.isArray(items)) {
     return (
       <ul className="list-group">
-        {Object.keys(items).map((item) => ( // когда вызывают не функцию ставят скобку, а не ФИГУРНУЮ скобку
+        {Object.keys(items).map((item) => (
           <li
             key={items[item][valueProperty]}
             className={

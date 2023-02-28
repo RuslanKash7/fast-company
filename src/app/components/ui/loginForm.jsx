@@ -1,19 +1,16 @@
 import React, { useState, useEffect } from "react";
-import TextField from "./textField";
-import { validator } from "../utils/validator";
+import { validator } from "../../utils/validator";
+import TextField from "../common/form/textField";
 
-const Login = () => {
+const LoginForm = () => {
   const [data, setData] = useState({ email: "", password: "" });
-
-  const [errors, setErrors] = useState({}); // тут пришлось добавить еррор, потому что без него не работает if (Object.keys(errors).length !== 0) return; в 39-ой строке.
-
+  const [errors, setErrors] = useState({});
   const handleChange = ({ target }) => {
     setData((prevState) => ({
       ...prevState,
       [target.name]: target.value
     }));
   };
-
   const validatorConfig = {
     email: {
       isRequired: {
@@ -38,31 +35,23 @@ const Login = () => {
         value: 8
       }
     }
-  }; // это объект с объектами, содержащими требования к полям
-
+  };
   useEffect(() => {
     validate();
   }, [data]);
-
   const validate = () => {
     const errors = validator(data, validatorConfig);
     setErrors(errors);
-    // console.log(Object.keys(errors).length);
-    // return Object.keys(errors).lenght === 0 || false; так не работает, всегда validate() выдает false.
+    return Object.keys(errors).length === 0;
   };
-
-  const isValid2 = Object.keys(errors).lenght === 0; // почему то не работает
+  const isValid = Object.keys(errors).length === 0;
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // const isValid = validate();
-    // console.log({ isValid });
-    // console.log(!isValid);
-    validate();
-    if (Object.keys(errors).length !== 0) return;
+    const isValid = validate();
+    if (!isValid) return;
     console.log(data);
   };
-
   return (
     <div className="container mt-5">
       <div className="row">
@@ -70,21 +59,25 @@ const Login = () => {
           <h3 className="mb-4">Login</h3>
           <form onSubmit={handleSubmit}>
             <TextField
-              label="электронная почта"
+              label="Электронная почта"
               name="email"
               value={data.email}
               onChange={handleChange}
               error={errors.email}
             />
             <TextField
-              label="пароль"
+              label="Пароль"
               type="password"
               name="password"
               value={data.password}
               onChange={handleChange}
               error={errors.password}
             />
-            <button type="submit" disabled={!isValid2} className={"btn btn-primary w-100 m-x auto"}>
+            <button
+              className="btn btn-primary w-100 mx-auto"
+              type="submit"
+              disabled={!isValid}
+            >
               Submit
             </button>
           </form>
@@ -94,4 +87,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default LoginForm;
