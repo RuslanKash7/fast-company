@@ -5,32 +5,32 @@ import Qualities from "../../ui/qualities";
 import { useHistory } from "react-router-dom";
 
 const UserPage = ({ userId }) => {
-  const history = useHistory();
-  const [user, setUser] = useState();
-  useEffect(() => {
-    api.users.getById(userId).then((data) => setUser(data));
-  });
-  const handleClick = () => {
-    history.push("/users");
-  };
-  if (user) {
-    return (
-      <div>
-        <h1> {user.name}</h1>
-        <h2>Профессия: {user.profession.name}</h2>
-        <Qualities qualities={user.qualities} />
-        <p>completedMeetings: {user.completedMeetings}</p>
-        <h2>Rate: {user.rate}</h2>
-        <button onClick={handleClick}> Все Пользователи</button>
-      </div>
-    );
-  } else {
-    return <h1>Loading</h1>;
-  }
+    const history = useHistory();
+    const [user, setUser] = useState();
+    useEffect(() => {
+        api.users.getById(userId).then((data) => setUser(data));
+    }, []);
+    const handleClick = () => {
+        history.push(`/users/${userId}/edit`);
+    };
+    if (user) {
+        return (
+            <div>
+                <h1> {user.name}</h1>
+                <h2>Профессия: {user.profession.name}</h2>
+                <Qualities qualities={user.qualities} />
+                <p>completedMeetings: {user.completedMeetings}</p>
+                <h2>Rate: {user.rate}</h2>
+                <button onClick={handleClick}>Изменить информацию о пользователе</button>
+            </div>
+        );
+    } else {
+        return "loading...";
+    }
 };
 
 UserPage.propTypes = {
-  userId: PropTypes.string.isRequired
+    userId: PropTypes.string.isRequired
 };
 
 export default UserPage;
