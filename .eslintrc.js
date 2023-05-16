@@ -19,6 +19,7 @@ module.exports = {
       "error",
       { anonymous: "always", named: "never" }
     ],
+    "multiline-ternary": ["off"],
     quotes: [
       "error",
       "double",
@@ -27,4 +28,4 @@ module.exports = {
       }
     ]
   }
-};
+}; // после того, как поменял тут что либо, надо перезапстить проект
