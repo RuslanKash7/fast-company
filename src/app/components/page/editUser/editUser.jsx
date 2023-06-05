@@ -7,6 +7,7 @@ import MultiSelectField from "../../common/form/multiSelectField";
 import api from "../../../api";
 import { validator } from "../../../utils/validator";
 import { useHistory } from "react-router-dom";
+import BackHistoryButton from "../../common/backButton";
 
 const EditUser = ({ userId }) => {
   const history = useHistory();
@@ -160,63 +161,66 @@ const EditUser = ({ userId }) => {
     return (
       <>
         {
-          <form onSubmit={handleSubmit}>
-            <div className="container mt-5">
-              <div className="row">
-                <div className="col-md-6 offset-md-3 shadow p-4">
-                  <h3 className="mb-4">Изменение данных о пользователе</h3>
-                  <TextField
-                    label="Имя"
-                    name="name"
-                    value={user.name}
-                    onChange={handleChange}
-                    error={errors.name}
-                  />
-                  <TextField
-                    label="Электронная почта"
-                    name="email"
-                    value={user.email}
-                    onChange={handleChange}
-                    error={errors.email}
-                  />
-                  <SelectField
-                    label="Выберите вашу профессию"
-                    defaultOption={user.profession.name}
-                    name="profession"
-                    onChange={handleChange}
-                    value={user.profession} // первый способ указать value={user.profession._id}, но он вроде не работает
-                    options={professions}
-                    error={errors.profession}
-                  />
-                  <RadioField
-                    label="Выберите ваш пол"
-                    name="sex"
-                    options={[
-                      { name: "Male", value: "male" },
-                      { name: "Female", value: "female" },
-                      { name: "Other", value: "other" }
-                    ]}
-                    value={user.sex}
-                    onChange={handleChange}
-                  />
-                  <MultiSelectField
-                    options={qualities}
-                    onChange={handleChange}
-                    defaultValue={user.qualities}
-                    name="qualities"
-                    label="Выберите ваши качества"
-                  />
-                  <button
-                    className="btn btn-primary w-100 mx-auto"
-                    type="submit"
-                    disabled={!isValid}
-                  >
-                    Submit
-                  </button>
-                </div>
+          <div className="container mt-5">
+            <BackHistoryButton />
+            <div className="row">
+              <div className="col-md-6 offset-md-3 shadow p-4">
+                <form onSubmit={handleSubmit}>
+                        <h3 className="mb-4">
+                          Изменение данных о пользователе
+                        </h3>
+                        <TextField
+                          label="Имя"
+                          name="name"
+                          value={user.name}
+                          onChange={handleChange}
+                          error={errors.name}
+                        />
+                        <TextField
+                          label="Электронная почта"
+                          name="email"
+                          value={user.email}
+                          onChange={handleChange}
+                          error={errors.email}
+                        />
+                        <SelectField
+                          label="Выберите вашу профессию"
+                          defaultOption={user.profession.name}
+                          name="profession"
+                          onChange={handleChange}
+                          value={user.profession} // первый способ указать value={user.profession._id}, но он вроде не работает
+                          options={professions}
+                          error={errors.profession}
+                        />
+                        <RadioField
+                          label="Выберите ваш пол"
+                          name="sex"
+                          options={[
+                            { name: "Male", value: "male" },
+                            { name: "Female", value: "female" },
+                            { name: "Other", value: "other" }
+                          ]}
+                          value={user.sex}
+                          onChange={handleChange}
+                        />
+                        <MultiSelectField
+                          options={qualities}
+                          onChange={handleChange}
+                          defaultValue={user.qualities}
+                          name="qualities"
+                          label="Выберите ваши качества"
+                        />
+                        <button
+                          className="btn btn-primary w-100 mx-auto"
+                          type="submit"
+                          disabled={!isValid}
+                        >
+                          Submit
+                        </button>
+                </form>
               </div>
             </div>
-          </form>
+          </div>
         }
       </>
     );

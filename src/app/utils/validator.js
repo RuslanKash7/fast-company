@@ -20,7 +20,7 @@ export function validator(data, config) {
       }
 
       case "isCapitalSymbol": {
-        const capitalRegExp = /[A-Z]+/g;
+        const capitalRegExp = /[A-Z, А-Я]+/g;
         statusValidate = !capitalRegExp.test(data);
         break;
       }
