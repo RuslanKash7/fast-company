@@ -4,10 +4,15 @@ import SelectField from "../common/form/selectField";
 import TextField from "../common/form/textField";
 import RadioField from "../common/form/radioField";
 import MultiSelectField from "../common/form/multiSelectField";
-import api from "../../api";
 import CheckBoxField from "../common/form/checkBoxField";
+import { useQuality } from "../../hooks/useQuality";
+import { useProfession } from "../../hooks/useProfession";
+import { useAuth } from "../../hooks/useAuth";
+import { useHistory } from "react-router-dom";
 
 const RegisterForm = () => {
+  const history = useHistory();
+
   const [data, setData] = useState({
     email: "",
     password: "",
@@ -17,31 +22,20 @@ const RegisterForm = () => {
     licence: false
   });
 
-  const [professions, setProfession] = useState();
+  const { signUp } = useAuth();
+
+  const { professions } = useProfession();
+
+  const professionsList = professions.map((p) => ({
+    label: p.name,
+    value: p._id
+  }));
 
   const [errors, setErrors] = useState({});
 
-  const [qualities, setQualities] = useState([]);
+  const { qualities } = useQuality();
 
-  useEffect(() => {
-    api.professions.fetchAll().then((data) => {
-      const professionsList = Object.keys(data).map((professionName) =>
-      ({
-        label: data[professionName].name,
-        value: data[professionName]._id
-      }));
-      setProfession(professionsList);
-    });
-
-    api.qualities.fetchAll().then((data) => {
-      const qualitiesList = Object.keys(data).map((optionName) => ({
-        label: data[optionName].name,
-        value: data[optionName]._id,
-        color: data[optionName].color
-      }));
-      setQualities(qualitiesList);
-    });
-  }, []);
+  const qualitiesList = qualities.map((q) => ({ label: q.name, value: q._id }));
 
   const handleChange = (target) => {
     setData((prevState) => ({
@@ -86,7 +80,8 @@ const RegisterForm = () => {
     },
     licence: {
       isRequired: {
-        message: "Вы не можите использовать наш сервис без подтвреждения лицензионного соглашения"
+        message:
+          "Вы не можите использовать наш сервис без подтвреждения лицензионного соглашения"
       }
     }
   };
@@ -103,40 +98,18 @@ const RegisterForm = () => {
 
   const isValid = Object.keys(errors).length === 0;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const isValid = validate();
     if (!isValid) return;
-    const { profession, qualities } = data;
-    console.log({
-      ...data,
-      profession: getProfessionById(profession),
-      qualities: getQualities(qualities)
-    });
-  };
-
-  const getProfessionById = (id) => {
-    for (const prof of professions) {
-      if (prof.value === id) {
-        return { _id: prof.value, name: prof.label };
-      }
+    const newData = { ...data, qualities: data.qualities.map((q) => q.value) };
+    // console.log(newData);
+    try {
+      await signUp(newData);
+      history.push("/");
+    } catch (error) {
+      setErrors(error);
     }
-  };
-
-  const getQualities = (elements) => {
-    const qualitiesArray = [];
-    for (const elem of elements) {
-      for (const quality in qualities) {
-        if (elem.value === qualities[quality].value) {
-          qualitiesArray.push({
-            _id: qualities[quality].value,
-            name: qualities[quality].label,
-            color: qualities[quality].color
-          });
-        }
-      }
-    }
-    return qualitiesArray;
   };
 
   return (
@@ -160,7 +133,7 @@ const RegisterForm = () => {
         label="Выберите свою профессию"
         defaultOption="Choose..."
         name="profession"
-        options={professions}
+        options={professionsList}
         onChange={handleChange}
         value={data.profession}
         error={errors.profession}
@@ -178,7 +151,7 @@ const RegisterForm = () => {
         error={errors.sex}
       />
       <MultiSelectField
-        options={qualities}
+        options={qualitiesList}
         onChange={handleChange}
         defaultValue={data.qualities}
         name="qualities"

@@ -44,7 +44,7 @@ export const ProfessionProvider = ({ children }) => {
     return professions.find((p) => p._id === id);
   }
 
-  console.log(error);
+  // console.log(error);
 
   return (
     <ProfessionContext.Provider value={{ isLoading, professions, getProfession }}>
