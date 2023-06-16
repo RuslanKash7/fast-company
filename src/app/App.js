@@ -8,12 +8,10 @@ import NavBar from "./components/ui/navBar";
 import { ProfessionProvider } from "./hooks/useProfession";
 import { QualityProvider } from "./hooks/useQuality";
 import AuthProvider from "./hooks/useAuth";
-import InProvider from "./hooks/useLogin";
 
 function App() {
   return (
     <div>
-      <InProvider>
       <AuthProvider>
         <NavBar />
         <ProfessionProvider>
@@ -27,7 +25,6 @@ function App() {
           </QualityProvider>
         </ProfessionProvider>
       </AuthProvider>
-      </InProvider>
       <ToastContainer />
     </div>
   );

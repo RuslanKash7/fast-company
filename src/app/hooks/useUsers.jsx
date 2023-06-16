@@ -29,7 +29,9 @@ const UserProvider = ({ children }) => {
 
   function errorCatcher(error) {
     const { message } = error.response.data;
+    console.log(message);
     setError(message);
+    setLoading(false);
   }
 
   async function getUsers() {
