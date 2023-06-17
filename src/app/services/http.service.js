@@ -25,7 +25,7 @@ http.interceptors.request.use(
       // проверяем есть ли вообще пользователь?
       if (refreshToken && expiresDate < Date.now()) {
         const { data } = await httpAuth.post("token", {
-          grand_type: "refresh_token",
+          grant_type: "refresh_token",
           refresh_token: refreshToken
         });
         // console.log(data);
@@ -37,10 +37,10 @@ http.interceptors.request.use(
         });
       }
       // для авторизированного запроса
-      const accessToken = localStorageService.getAccessToken();
-      if (accessToken) {
-        config.params = { ...config, auth: accessToken };
-      }
+      // const accessToken = localStorageService.getAccessToken();
+      // if (accessToken) {
+      //   config.params = { ...config, auth: accessToken };
+      // }
     }
     return config;
   },
