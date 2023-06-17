@@ -37,10 +37,10 @@ http.interceptors.request.use(
         });
       }
       // для авторизированного запроса
-      // const accessToken = localStorageService.getAccessToken();
-      // if (accessToken) {
-      //   config.params = { ...config, auth: accessToken };
-      // }
+      const accessToken = localStorageService.getAccessToken();
+      if (accessToken) {
+        config.params = { ...config.params, auth: accessToken };
+      }
     }
     return config;
   },
