@@ -47,7 +47,9 @@ const LoginForm = () => {
     if (!isValid) return;
     try {
       await signIn(data);
-      history.push("/");
+      history.push(
+        history.location.state ? history.location.state.from.pathname : "/"
+      );
     } catch (error) {
       setEnterError(error.message);
     }
@@ -71,14 +73,10 @@ const LoginForm = () => {
         onChange={handleChange}
         error={errors.password}
       />
-      <CheckBoxField
-        value={data.stayOn}
-        onChange={handleChange}
-        name="stayOn"
-      >
+      <CheckBoxField value={data.stayOn} onChange={handleChange} name="stayOn">
         Оставаться в системе
       </CheckBoxField>
-      { enterError && <p className="text-danger">{enterError}</p> }
+      {enterError && <p className="text-danger">{enterError}</p>}
       <button
         className="btn btn-primary w-100 mx-auto"
         type="submit"
