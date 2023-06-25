@@ -29,7 +29,9 @@ const UserProvider = ({ children }) => {
 
   function errorCatcher(error) {
     const { message } = error.response.data;
+    console.log(message);
     setError(message);
+    setLoading(false);
   }
 
   async function getUsers() {
@@ -42,8 +44,12 @@ const UserProvider = ({ children }) => {
     }
   }
 
+  // для получения одного пользователя в userPage.jsx
+function getUserById(userId) {
+  return users.find((u) => u._id === userId);
+}
   return (
-    <UserContext.Provider value={{ users }}>
+    <UserContext.Provider value={{ users, getUserById }}>
       {!isLoading ? children : <h1>Users are loading...</h1>}
     </UserContext.Provider>
   );

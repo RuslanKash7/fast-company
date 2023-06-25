@@ -4,64 +4,83 @@ import SelectField from "../../common/form/selectField";
 import TextField from "../../common/form/textField";
 import RadioField from "../../common/form/radioField";
 import MultiSelectField from "../../common/form/multiSelectField";
-import api from "../../../api";
 import { validator } from "../../../utils/validator";
 import { useHistory } from "react-router-dom";
 import BackHistoryButton from "../../common/backButton";
+import { useQuality } from "../../../hooks/useQuality";
+import { useProfession } from "../../../hooks/useProfession";
+import { useAuth } from "../../../hooks/useAuth";
 
 const EditUser = ({ userId }) => {
   const history = useHistory();
-
-  const [user, setUser] = useState({
-    name: "",
-    email: "",
-    profession: "",
-    sex: "",
-    qualities: []
-  });
-
-  const [professions, setProfession] = useState();
-
+  const { currentUser, updateUserData } = useAuth();
+  const { professions, isLoading: professionsLoading } = useProfession();
+  const { qualities, isLoading: qualitiesLoading } = useQuality();
+  const [isLoading, setIsLoading] = useState(true);
+  const [data, setData] = useState();
   const [errors, setErrors] = useState({});
 
-  const [qualities, setQualities] = useState([]);
+  const professionList = professions.map((prof) => ({
+    label: prof.name,
+    value: prof._id
+  }));
 
-  // console.log(user);
-  // console.log(professions);
-  // console.log(qualities);
+  const qualityList = qualities.map((qual) => ({
+    label: qual.name,
+    value: qual._id
+  }));
+
+  // console.log(data);
+  // console.log(professions, professionsLoading);
+  // console.log(qualities, qualitiesLoading);
+
+  const getQualitiesById = (qualitIds) => {
+    const resultArray = [];
+    for (const ids of qualitIds) {
+      for (const quality of qualities) {
+        if (ids === quality._id) {
+          resultArray.push(quality);
+          break;
+        }
+      }
+    }
+    return resultArray;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const isValid = validate();
+    if (!isValid) return;
+
+    await updateUserData({
+      ...data,
+      qualities: data.qualities.map((qual) => qual.value)
+    });
+    history.push(`/users/${userId}`);
+  };
+
+  const transformData = (data) =>
+    getQualitiesById(data).map((qual) => ({
+      label: qual.name,
+      value: qual._id
+    }));
 
   useEffect(() => {
-    api.users.getById(userId).then((data) =>
-      setUser((prevState) => ({
-        ...prevState,
-        ...data, // приводим полученные данные из АПИ к требуемому виду
-        profession: data.profession._id,
-        qualities: data.qualities.map((qual) => ({
-          label: qual.name,
-          value: qual._id
-        }))
-      }))
-    ); // а если использовать fetchAll() то прийдет весь массив юзеров. и второй способ вместо value={user.profession._id}
-    api.professions.fetchAll().then((data) => {
-      const professionsList = Object.keys(data).map((professionName) => ({
-        label: data[professionName].name,
-        value: data[professionName]._id
-      }));
-      setProfession(professionsList);
-    });
+    if (!professionsLoading && !qualitiesLoading && currentUser && !data) {
+      setData({
+        ...currentUser,
+        qualities: transformData(currentUser.qualities)
+      });
+    }
+    console.log(qualities, qualitiesLoading);
+  }, [professionsLoading, qualitiesLoading, currentUser, data]);
 
-    api.qualities.fetchAll().then((data) => {
-      const qualitiesList = Object.keys(data).map((optionName) => ({
-        label: data[optionName].name,
-        value: data[optionName]._id,
-        color: data[optionName].color
-      }));
-      setQualities(qualitiesList);
-    });
-  }, []);
+  useEffect(() => {
+    if (data && isLoading) setIsLoading(false);
+  }, [data]);
 
   const handleChange = (target) => {
-    setUser((prevState) => ({
+    setData((prevState) => ({
       ...prevState,
       [target.name]: target.value
     }));
@@ -83,13 +102,6 @@ const EditUser = ({ userId }) => {
       isCapitalSymbol: {
         message: "Имя должено содержать хотя бы одну заглавную букву"
       }
-      // isContainDigit: {
-      //   message: "Имя должено содержать хотя бы одно число"
-      // },
-      // min: {
-      //   message: "Имя должено состоять минимум из 8 символов",
-      //   value: 8
-      // }
     },
     profession: {
       isRequired: {
@@ -105,128 +117,84 @@ const EditUser = ({ userId }) => {
 
   useEffect(() => {
     validate();
-  }, [user]);
+  }, [data]);
 
   const validate = () => {
-    const errors = validator(user, validatorConfig);
+    const errors = validator(data, validatorConfig);
     setErrors(errors);
     return Object.keys(errors).length === 0;
   };
 
   const isValid = Object.keys(errors).length === 0;
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const isValid = validate();
-    if (!isValid) return;
-    const { profession, qualities } = user;
-    api.users
-      .update(userId, {
-        ...user,
-        profession: getProfessionById(profession),
-        qualities: getQualities(qualities)
-      })
-      .then(() => {
-        history.push(`/users/${userId}`);
-      }); // запись введенных нами в форме данных
-  };
-
-  const getProfessionById = (id) => {
-    // эти функции возвращают наши данные к изначальному виду
-    for (const prof of professions) {
-      if (prof.value === id) {
-        return { _id: prof.value, name: prof.label };
-      }
-    }
-  };
-
-  const getQualities = (elements) => {
-    // эти функции возвращают наши данные к изначальному виду
-    const qualitiesArray = [];
-    for (const elem of elements) {
-      for (const quality in qualities) {
-        if (elem.value === qualities[quality].value) {
-          qualitiesArray.push({
-            _id: qualities[quality].value,
-            name: qualities[quality].label,
-            color: qualities[quality].color
-          });
-        }
-      }
-    }
-    return qualitiesArray;
-  };
-
-  if (user._id && professions && qualities) {
-    return (
-      <>
-        {
-          <div className="container mt-5">
-            <BackHistoryButton />
-            <div className="row">
-              <div className="col-md-6 offset-md-3 shadow p-4">
+  return (
+    <>
+      {
+        <div className="container mt-5">
+          <BackHistoryButton />
+          <div className="row mt-2">
+            <div className="col-md-6 offset-md-3 shadow p-4">
+              {!isLoading && Object.keys(professions).length > 0 ? (
                 <form onSubmit={handleSubmit}>
-                        <h3 className="mb-4">
-                          Изменение данных о пользователе
-                        </h3>
-                        <TextField
-                          label="Имя"
-                          name="name"
-                          value={user.name}
-                          onChange={handleChange}
-                          error={errors.name}
-                        />
-                        <TextField
-                          label="Электронная почта"
-                          name="email"
-                          value={user.email}
-                          onChange={handleChange}
-                          error={errors.email}
-                        />
-                        <SelectField
-                          label="Выберите вашу профессию"
-                          defaultOption={user.profession.name}
-                          name="profession"
-                          onChange={handleChange}
-                          value={user.profession} // первый способ указать value={user.profession._id}, но он вроде не работает
-                          options={professions}
-                          error={errors.profession}
-                        />
-                        <RadioField
-                          label="Выберите ваш пол"
-                          name="sex"
-                          options={[
-                            { name: "Male", value: "male" },
-                            { name: "Female", value: "female" },
-                            { name: "Other", value: "other" }
-                          ]}
-                          value={user.sex}
-                          onChange={handleChange}
-                        />
-                        <MultiSelectField
-                          options={qualities}
-                          onChange={handleChange}
-                          defaultValue={user.qualities}
-                          name="qualities"
-                          label="Выберите ваши качества"
-                        />
-                        <button
-                          className="btn btn-primary w-100 mx-auto"
-                          type="submit"
-                          disabled={!isValid}
-                        >
-                          Submit
-                        </button>
+                  <h3 className="mb-4">Изменение данных о пользователе</h3>
+                  <TextField
+                    label="Имя"
+                    name="name"
+                    value={data.name}
+                    onChange={handleChange}
+                    error={errors.name}
+                  />
+                  <TextField
+                    label="Электронная почта"
+                    name="email"
+                    value={data.email}
+                    onChange={handleChange}
+                    error={errors.email}
+                  />
+                  <SelectField
+                    label="Выберите вашу профессию"
+                    defaultOption="Choose"
+                    name="profession"
+                    onChange={handleChange}
+                    value={data.profession} // первый способ указать value={user.profession._id}, но он вроде не работает
+                    options={professionList}
+                    error={errors.profession}
+                  />
+                  <RadioField
+                    label="Выберите ваш пол"
+                    name="sex"
+                    options={[
+                      { name: "Male", value: "male" },
+                      { name: "Female", value: "female" },
+                      { name: "Other", value: "other" }
+                    ]}
+                    value={data.sex}
+                    onChange={handleChange}
+                  />
+                  <MultiSelectField
+                    options={qualityList}
+                    onChange={handleChange}
+                    defaultValue={data.qualities}
+                    name="qualities"
+                    label="Выберите ваши качества"
+                  />
+                  <button
+                    className="btn btn-primary w-100 mx-auto"
+                    type="submit"
+                    disabled={!isValid}
+                  >
+                    Submit
+                  </button>
                 </form>
-              </div>
+              ) : (
+                "Loading 134..."
+              )}
             </div>
           </div>
-        }
-      </>
-    );
-  } else {
-    return "loading...";
-  }
+        </div>
+      }
+    </>
+  );
 };
 
 EditUser.propTypes = {

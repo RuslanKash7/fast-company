@@ -28,7 +28,7 @@ export const QualityProvider = ({ children }) => {
   function errorCatcher(error) {
     const { message } = error.response.data;
     setError(message);
-  }
+}
 
   async function getQualityList() {
     try {
