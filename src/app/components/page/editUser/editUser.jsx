@@ -7,15 +7,25 @@ import MultiSelectField from "../../common/form/multiSelectField";
 import { validator } from "../../../utils/validator";
 import { useHistory } from "react-router-dom";
 import BackHistoryButton from "../../common/backButton";
-import { useQuality } from "../../../hooks/useQuality";
-import { useProfession } from "../../../hooks/useProfession";
+import { useSelector } from "react-redux";
 import { useAuth } from "../../../hooks/useAuth";
+import {
+  getQualities,
+  getQualitiesLoadingStatus
+} from "../../../store/qualities";
+import {
+  getProfessions,
+  getProfessionsLoadingStatus
+} from "../../../store/professions";
 
 const EditUser = ({ userId }) => {
   const history = useHistory();
   const { currentUser, updateUserData } = useAuth();
-  const { professions, isLoading: professionsLoading } = useProfession();
-  const { qualities, isLoading: qualitiesLoading } = useQuality();
+  // const { qualities, isLoading: qualitiesLoading } = useQuality(); till Redux done like this
+  const qualities = useSelector(getQualities());
+  const qualitiesLoading = useSelector(getQualitiesLoadingStatus());
+  const professions = useSelector(getProfessions());
+  const professionsLoading = useSelector(getProfessionsLoadingStatus());
   const [isLoading, setIsLoading] = useState(true);
   const [data, setData] = useState();
   const [errors, setErrors] = useState({});
