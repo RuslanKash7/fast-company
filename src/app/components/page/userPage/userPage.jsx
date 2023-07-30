@@ -5,8 +5,10 @@ import UserCard from "../../ui/userCard";
 import MeetingsCard from "../../ui/meetingsCard";
 import QualitiesCard from "../../ui/qualitiesCard";
 import Comments from "../../ui/comments";
-import { useUser } from "../../../hooks/useUsers";
+
 import { CommentsProvider } from "../../../hooks/useComments";
+import { useSelector } from "react-redux";
+import { getUserById } from "../../../store/users";
 
 const UserPage = ({ userId }) => {
   // const [user, setUser] = useState(); это способ получения данных из апи
@@ -15,8 +17,7 @@ const UserPage = ({ userId }) => {
   //   api.users.getById(userId).then((data) => setUser(data));
   // }, []); это способ получения данных из апи
 
-  const { getUserById } = useUser();
-  const user = getUserById(userId);
+  const user = useSelector(getUserById(userId));
   if (user) {
     return (
       <div className="container">

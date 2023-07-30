@@ -5,10 +5,8 @@ import TextField from "../../common/form/textField";
 import RadioField from "../../common/form/radioField";
 import MultiSelectField from "../../common/form/multiSelectField";
 import { validator } from "../../../utils/validator";
-import { useHistory } from "react-router-dom";
 import BackHistoryButton from "../../common/backButton";
-import { useSelector } from "react-redux";
-import { useAuth } from "../../../hooks/useAuth";
+import { useDispatch, useSelector } from "react-redux";
 import {
   getQualities,
   getQualitiesLoadingStatus
@@ -17,10 +15,11 @@ import {
   getProfessions,
   getProfessionsLoadingStatus
 } from "../../../store/professions";
+import { getCurrentUserData, updateUser } from "../../../store/users";
 
-const EditUser = ({ userId }) => {
-  const history = useHistory();
-  const { currentUser, updateUserData } = useAuth();
+const EditUser = () => {
+  const dispatch = useDispatch();
+  const currentUser = useSelector(getCurrentUserData());
   // const { qualities, isLoading: qualitiesLoading } = useQuality(); till Redux done like this
   const qualities = useSelector(getQualities());
   const qualitiesLoading = useSelector(getQualitiesLoadingStatus());
@@ -29,6 +28,8 @@ const EditUser = ({ userId }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [data, setData] = useState();
   const [errors, setErrors] = useState({});
+
+  console.log({ getCurrentUserData });
 
   const professionList = professions.map((prof) => ({
     label: prof.name,
@@ -57,16 +58,14 @@ const EditUser = ({ userId }) => {
     return resultArray;
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     const isValid = validate();
     if (!isValid) return;
-
-    await updateUserData({
+    dispatch(updateUser({
       ...data,
       qualities: data.qualities.map((qual) => qual.value)
-    });
-    history.push(`/users/${userId}`);
+    }));
   };
 
   const transformData = (data) =>
