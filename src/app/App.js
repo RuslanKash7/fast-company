@@ -7,27 +7,27 @@ import LogOut from "./layouts/logOut";
 import Main from "./layouts/main";
 import NavBar from "./components/ui/navBar";
 import { ProfessionProvider } from "./hooks/useProfession";
-import { QualityProvider } from "./hooks/useQuality";
 import AuthProvider from "./hooks/useAuth";
 import ProtectedRoute from "./components/common/protectedRoute";
+import AppLoader from "./components/ui/hoc/appLoader";
 
 function App() {
   return (
     <div>
-      <AuthProvider>
-        <NavBar />
-        <ProfessionProvider>
-          <QualityProvider>
+      <AppLoader>
+        <AuthProvider>
+          <NavBar />
+          <ProfessionProvider>
             <Switch>
               <ProtectedRoute path="/users/:userId?/:edit?" component={Users} />
               <Route path="/login/:type?" component={Login} />
-              <Route path="/logout" component={LogOut}/>
+              <Route path="/logout" component={LogOut} />
               <Route path="/" exact component={Main} />
               <Redirect to="/" />
             </Switch>
-          </QualityProvider>
-        </ProfessionProvider>
-      </AuthProvider>
+          </ProfessionProvider>
+        </AuthProvider>
+      </AppLoader>
       <ToastContainer />
     </div>
   );
